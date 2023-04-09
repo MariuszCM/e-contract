@@ -1,0 +1,7 @@
+@import url('./main-layout.css');
+@import url('./views/create-view.css');
+@import url('./views/hello-world-view.css');
+@import url('./views/find-view.css');    html {
+      --lumo-base-color: #f0f6ff;
+
+    }
