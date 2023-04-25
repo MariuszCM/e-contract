@@ -14,9 +14,11 @@ import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -29,19 +31,24 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 @AnonymousAllowed
 @Uses(Icon.class)
 public class CreateView extends Div {
-    /**
-     * Uwaga! Nie wszystkie pola sie tu znajduja
-     */
     private TextField contractNumber = new TextField("Number umowy");
+    private TextField contractType = new TextField("Rodzaj umowy");
     private DatePicker signingDate = new DatePicker("Data podpisania");
-    private TextField contractSubject = new TextField("Temat umowy");
-    private NumberField totalValue = new NumberField("Całkowita kwota netto");
-    private TextField contractorNIP = new TextField("Numer NIP");
-    private TextField contractorName = new TextField("Nazwa przedsiębiorcy");
-    private PhoneNumberField contractorNumber = new PhoneNumberField("Number kontaktowy do przedsiębiorcy");
+    private TextField contractSigningPlace = new TextField("Miejsce zawarcia umowy");
+    private DatePicker contractStartDate = new DatePicker("Termin rozpoczęcia obowiązywania umowy");
+    private DatePicker contractEndDate = new DatePicker("Termin zakończenia obowiązywania umowy");
+    private TextField contractSubject = new TextField("Przedmiot umowy");
+    private NumberField totalValue = new NumberField("Całkowita wartość umowy");
+    private TextField contractorNIP = new TextField();
+    private TextField contractorName = new TextField("Kontrahent");
+    private TextField contractorAddress = new TextField("Siedziba/adres kontrahenta");
+    private ComboBox<String> sendToMF = new ComboBox<>();
+    private HorizontalLayout horizontalLayoutNip = new HorizontalLayout();
+
 
     private Button cancel = new Button("Anuluj");
     private Button save = new Button("Zapisz");
+    private Button search = new Button("Szukaj");
 
     private Binder<Contract> binder = new Binder<>(Contract.class);
 
@@ -49,11 +56,16 @@ public class CreateView extends Div {
         addClassName("create-view");
 
         add(createTitle());
+        contractorNIP.setPlaceholder("NIP kontrahenta");
+        horizontalLayoutNip.add(contractorNIP, search);
+
         add(createFormLayout());
         add(createButtonLayout());
         contractorNIP.setAllowedCharPattern("[0-9]*");
         contractorNIP.setMaxLength(10);
         contractorNIP.setMinLength(10);
+        sendToMF.setItems("Tak", "Nie");
+        sendToMF.setLabel("Czy umowa/aneks przesyłana do rejestru MF");
 
         binder.bindInstanceFields(this);
         clearForm();
@@ -75,7 +87,8 @@ public class CreateView extends Div {
 
     private Component createFormLayout() {
         FormLayout formLayout = new FormLayout();
-        formLayout.add(contractNumber, contractSubject, contractorNIP, contractorName, contractorNumber, signingDate, totalValue);
+        formLayout.add(contractNumber, contractType, signingDate, contractSigningPlace, contractStartDate,
+                contractEndDate, contractSubject, totalValue, horizontalLayoutNip, contractorName, contractorAddress, sendToMF);
         return formLayout;
     }
 
