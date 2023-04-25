@@ -25,7 +25,13 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
         LoginI18n i18n = LoginI18n.createDefault();
         i18n.setHeader(new LoginI18n.Header());
         i18n.getHeader().setTitle("E-Contract");
-        i18n.getHeader().setDescription("Login using user/user or admin/admin");
+        LoginI18n.ErrorMessage errorMessage = new LoginI18n.ErrorMessage();
+        errorMessage.setMessage("Niepoprawne dane do logowania!");
+        i18n.setErrorMessage(errorMessage);
+        i18n.getForm().setTitle("Zaloguj się");
+        i18n.getForm().setUsername("Nazwa użytkownika");
+        i18n.getForm().setPassword("Hasło");
+        i18n.getForm().setSubmit("Zaloguj");
         i18n.setAdditionalInformation(null);
         setI18n(i18n);
 

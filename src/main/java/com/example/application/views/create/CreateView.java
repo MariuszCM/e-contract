@@ -1,5 +1,6 @@
 package com.example.application.views.create;
 
+import com.example.application.data.entity.Contract;
 import com.example.application.data.entity.SamplePerson;
 import com.example.application.data.service.SamplePersonService;
 import com.example.application.views.MainLayout;
@@ -16,30 +17,33 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.textfield.EmailField;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
-@PageTitle("Create")
+@PageTitle("Nowy dokument")
 @Route(value = "create", layout = MainLayout.class)
 @AnonymousAllowed
 @Uses(Icon.class)
 public class CreateView extends Div {
+    /**
+     * Uwaga! Nie wszystkie pola sie tu znajduja
+     */
+    private TextField contractNumber = new TextField("Number umowy");
+    private DatePicker signingDate = new DatePicker("Data podpisania");
+    private TextField contractSubject = new TextField("Temat umowy");
+    private NumberField totalValue = new NumberField("Całkowita kwota netto");
+    private TextField contractorNIP = new TextField("Numer NIP");
+    private TextField contractorName = new TextField("Nazwa przedsiębiorcy");
+    private PhoneNumberField contractorNumber = new PhoneNumberField("Number kontaktowy do przedsiębiorcy");
 
-    private TextField firstName = new TextField("First name");
-    private TextField lastName = new TextField("Last name");
-    private EmailField email = new EmailField("Email address");
-    private DatePicker dateOfBirth = new DatePicker("Birthday");
-    private PhoneNumberField phone = new PhoneNumberField("Phone number");
-    private TextField occupation = new TextField("Occupation");
+    private Button cancel = new Button("Anuluj");
+    private Button save = new Button("Zapisz");
 
-    private Button cancel = new Button("Cancel");
-    private Button save = new Button("Save");
-
-    private Binder<SamplePerson> binder = new Binder<>(SamplePerson.class);
+    private Binder<Contract> binder = new Binder<>(Contract.class);
 
     public CreateView(SamplePersonService personService) {
         addClassName("create-view");
@@ -47,30 +51,31 @@ public class CreateView extends Div {
         add(createTitle());
         add(createFormLayout());
         add(createButtonLayout());
+        contractorNIP.setAllowedCharPattern("[0-9]*");
+        contractorNIP.setMaxLength(10);
+        contractorNIP.setMinLength(10);
 
         binder.bindInstanceFields(this);
         clearForm();
 
         cancel.addClickListener(e -> clearForm());
         save.addClickListener(e -> {
-            personService.update(binder.getBean());
-            Notification.show(binder.getBean().getClass().getSimpleName() + " details stored.");
+            Notification.show("Dane umowy zostały zapisane");
             clearForm();
         });
     }
 
     private void clearForm() {
-        binder.setBean(new SamplePerson());
+        binder.setBean(new Contract());
     }
 
     private Component createTitle() {
-        return new H3("Personal information");
+        return new H3("Wprowadzanie nowej umowy");
     }
 
     private Component createFormLayout() {
         FormLayout formLayout = new FormLayout();
-        email.setErrorMessage("Please enter a valid email address");
-        formLayout.add(firstName, lastName, dateOfBirth, phone, email, occupation);
+        formLayout.add(contractNumber, contractSubject, contractorNIP, contractorName, contractorNumber, signingDate, totalValue);
         return formLayout;
     }
 
@@ -90,9 +95,9 @@ public class CreateView extends Div {
         public PhoneNumberField(String label) {
             setLabel(label);
             countryCode.setWidth("120px");
-            countryCode.setPlaceholder("Country");
+            countryCode.setPlaceholder("Prefix");
             countryCode.setAllowedCharPattern("[\\+\\d]");
-            countryCode.setItems("+354", "+91", "+62", "+98", "+964", "+353", "+44", "+972", "+39", "+225");
+            countryCode.setItems("+48", "+49", "+33", "+44", "+39");
             countryCode.addCustomValueSetListener(e -> countryCode.setValue(e.getDetail()));
             number.setAllowedCharPattern("\\d");
             HorizontalLayout layout = new HorizontalLayout(countryCode, number);

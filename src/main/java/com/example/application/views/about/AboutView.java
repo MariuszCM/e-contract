@@ -31,7 +31,7 @@ public class AboutView extends HorizontalLayout {
         setMargin(true);
         setVerticalComponentAlignment(Alignment.END, name, sayHello);
 
-        add(name, sayHello);
+//        add(name, sayHello);
     }
 
 }

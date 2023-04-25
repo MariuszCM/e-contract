@@ -154,13 +154,13 @@ public class MainLayout extends AppLayout {
 
     private MenuItemInfo[] createMenuItems() {
         return new MenuItemInfo[]{ //
-                new MenuItemInfo("About", LineAwesomeIcon.GLOBE_SOLID.create(), AboutView.class), //
+                new MenuItemInfo("Main", LineAwesomeIcon.GLOBE_SOLID.create(), AboutView.class), //
 
-                new MenuItemInfo("Create", LineAwesomeIcon.USER.create(), CreateView.class), //
+                new MenuItemInfo("Utwórz", LineAwesomeIcon.USER.create(), CreateView.class), //
 
-                new MenuItemInfo("Hello World", LineAwesomeIcon.COLUMNS_SOLID.create(), HelloWorldView.class), //
+//                new MenuItemInfo("Hello World", LineAwesomeIcon.COLUMNS_SOLID.create(), HelloWorldView.class), //
 
-                new MenuItemInfo("Find", LineAwesomeIcon.FILTER_SOLID.create(), FindView.class), //
+//                new MenuItemInfo("Znajdź", LineAwesomeIcon.FILTER_SOLID.create(), FindView.class), //
 
         };
     }
