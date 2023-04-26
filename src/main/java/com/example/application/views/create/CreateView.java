@@ -2,7 +2,9 @@ package com.example.application.views.create;
 
 import com.example.application.data.entity.Contract;
 import com.example.application.data.entity.SamplePerson;
+import com.example.application.data.service.NipApiService;
 import com.example.application.data.service.SamplePersonService;
+import com.example.application.regonApi.model.CompanyIntegration;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -25,6 +27,8 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @PageTitle("Nowy dokument")
 @Route(value = "create", layout = MainLayout.class)
@@ -42,8 +46,9 @@ public class CreateView extends Div {
     private TextField contractorNIP = new TextField();
     private TextField contractorName = new TextField("Kontrahent");
     private TextField contractorAddress = new TextField("Siedziba/adres kontrahenta");
-    private ComboBox<String> sendToMF = new ComboBox<>();
+    private ComboBox<String> sendToMF = new ComboBox<>("Czy umowa/aneks przesyłana do rejestru MF");
     private HorizontalLayout horizontalLayoutNip = new HorizontalLayout();
+    private final NipApiService regonApiPromptService;
 
 
     private Button cancel = new Button("Anuluj");
@@ -52,7 +57,8 @@ public class CreateView extends Div {
 
     private Binder<Contract> binder = new Binder<>(Contract.class);
 
-    public CreateView(SamplePersonService personService) {
+    public CreateView(SamplePersonService personService, NipApiService regonApiPromptService) {
+        this.regonApiPromptService = regonApiPromptService;
         addClassName("create-view");
 
         add(createTitle());
@@ -65,16 +71,11 @@ public class CreateView extends Div {
         contractorNIP.setMaxLength(10);
         contractorNIP.setMinLength(10);
         sendToMF.setItems("Tak", "Nie");
-        sendToMF.setLabel("Czy umowa/aneks przesyłana do rejestru MF");
 
         binder.bindInstanceFields(this);
         clearForm();
+        addListener();
 
-        cancel.addClickListener(e -> clearForm());
-        save.addClickListener(e -> {
-            Notification.show("Dane umowy zostały zapisane");
-            clearForm();
-        });
     }
 
     private void clearForm() {
@@ -101,46 +102,21 @@ public class CreateView extends Div {
         return buttonLayout;
     }
 
-    private static class PhoneNumberField extends CustomField<String> {
-        private ComboBox<String> countryCode = new ComboBox<>();
-        private TextField number = new TextField();
-
-        public PhoneNumberField(String label) {
-            setLabel(label);
-            countryCode.setWidth("120px");
-            countryCode.setPlaceholder("Prefix");
-            countryCode.setAllowedCharPattern("[\\+\\d]");
-            countryCode.setItems("+48", "+49", "+33", "+44", "+39");
-            countryCode.addCustomValueSetListener(e -> countryCode.setValue(e.getDetail()));
-            number.setAllowedCharPattern("\\d");
-            HorizontalLayout layout = new HorizontalLayout(countryCode, number);
-            layout.setFlexGrow(1.0, number);
-            add(layout);
-        }
-
-        @Override
-        protected String generateModelValue() {
-            if (countryCode.getValue() != null && number.getValue() != null) {
-                String s = countryCode.getValue() + " " + number.getValue();
-                return s;
+    private void addListener() {
+        cancel.addClickListener(e -> clearForm());
+        save.addClickListener(e -> {
+            Notification.show("Dane umowy zostały zapisane");
+            clearForm();
+        });
+        search.addClickListener(e -> {
+            if (contractorNIP.getValue() != "") {
+                CompanyIntegration companyFromApi = regonApiPromptService.getFullCompanyReport(contractorNIP.getValue());
+                contractorName.setValue(companyFromApi.getCompanyName());
+                if (companyFromApi.getStreet() != null && companyFromApi.getCity() != null) {
+                    contractorAddress.setValue(companyFromApi.getStreet() + " " + companyFromApi.getCity());
+                }
             }
-            return "";
-        }
-
-        @Override
-        protected void setPresentationValue(String phoneNumber) {
-            String[] parts = phoneNumber != null ? phoneNumber.split(" ", 2) : new String[0];
-            if (parts.length == 1) {
-                countryCode.clear();
-                number.setValue(parts[0]);
-            } else if (parts.length == 2) {
-                countryCode.setValue(parts[0]);
-                number.setValue(parts[1]);
-            } else {
-                countryCode.clear();
-                number.clear();
-            }
-        }
+        });
     }
 
 }

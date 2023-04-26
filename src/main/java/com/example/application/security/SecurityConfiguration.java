@@ -24,6 +24,10 @@ public class SecurityConfiguration extends VaadinWebSecurity {
 
         http.authorizeHttpRequests().requestMatchers(new AntPathRequestMatcher("/images/*.png")).permitAll();
 
+        http.authorizeHttpRequests(auth -> auth.requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**"))
+                .permitAll()).headers(headers -> headers.frameOptions().disable())
+                .csrf(csrf -> csrf.ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")));
+
         // Icons from the line-awesome addon
         http.authorizeHttpRequests().requestMatchers(new AntPathRequestMatcher("/line-awesome/**/*.svg")).permitAll();
         super.configure(http);

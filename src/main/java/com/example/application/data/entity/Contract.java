@@ -1,6 +1,13 @@
 package com.example.application.data.entity;
 
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.textfield.NumberField;
+import com.vaadin.flow.component.textfield.TextField;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -10,17 +17,20 @@ import java.time.LocalDate;
 @Data
 public class Contract extends AbstractEntity{
 
-    private String contractId;
-    private String integrationStatus;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String contractNumber;
-    private LocalDate registrationDate;
-    private String status;
+    private String contractType;
     private LocalDate signingDate;
+    private String contractSigningPlace;
+    private LocalDate contractStartDate;
+    private LocalDate contractEndDate;
     private String contractSubject;
-    //TODO poprawic na bigDecimal
+    //TODO skonfigurowac na bigDecimal
     private Double totalValue;
     private String contractorNIP;
     private String contractorName;
-    private String contractorNumber;
-    private String userRegistryId;
+    private String contractorAddress;
+    private String sendToMF;
 }
