@@ -1,7 +1,7 @@
 package com.example.application.views.create;
 
 import com.example.application.data.entity.Contract;
-import com.example.application.data.entity.SamplePerson;
+import com.example.application.data.service.ContractService;
 import com.example.application.data.service.NipApiService;
 import com.example.application.data.service.SamplePersonService;
 import com.example.application.regonApi.model.CompanyIntegration;
@@ -10,25 +10,20 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 @PageTitle("Nowy dokument")
 @Route(value = "create", layout = MainLayout.class)
@@ -49,7 +44,8 @@ public class CreateView extends Div {
     private ComboBox<String> sendToMF = new ComboBox<>("Czy umowa/aneks przesyłana do rejestru MF");
     private HorizontalLayout horizontalLayoutNip = new HorizontalLayout();
     private final NipApiService regonApiPromptService;
-
+    private Contract contract;
+    private ContractService contractService;
 
     private Button cancel = new Button("Anuluj");
     private Button save = new Button("Zapisz");
@@ -57,8 +53,10 @@ public class CreateView extends Div {
 
     private Binder<Contract> binder = new Binder<>(Contract.class);
 
-    public CreateView(SamplePersonService personService, NipApiService regonApiPromptService) {
+    public CreateView(ContractService contractService, NipApiService regonApiPromptService) {
         this.regonApiPromptService = regonApiPromptService;
+        this.contractService = contractService;
+        this.contract = new Contract();
         addClassName("create-view");
 
         add(createTitle());
@@ -105,8 +103,13 @@ public class CreateView extends Div {
     private void addListener() {
         cancel.addClickListener(e -> clearForm());
         save.addClickListener(e -> {
-            Notification.show("Dane umowy zostały zapisane");
-            clearForm();
+            boolean result = binder.writeBeanIfValid(contract);
+            if (result) {
+                contractService.save(contract);
+                contract = new Contract();
+                Notification.show("Dane umowy zostały zapisane");
+                clearForm();
+            }
         });
         search.addClickListener(e -> {
             if (contractorNIP.getValue() != "") {
