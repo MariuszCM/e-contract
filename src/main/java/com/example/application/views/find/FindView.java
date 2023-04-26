@@ -135,15 +135,19 @@ public class FindView extends Div {
 
             if (!contractNumber.isEmpty()) {
                 String lowerCaseFilter = contractNumber.getValue().toLowerCase();
-                Predicate contractNumberMatch = criteriaBuilder.like(criteriaBuilder.lower(root.get("contractNumber")),
-                        lowerCaseFilter + "%");
-                predicates.add(criteriaBuilder.or(contractNumberMatch));
+                Predicate contractNumberMatch = criteriaBuilder.or(
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("contractNumber")), lowerCaseFilter + "%"),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("contractNumber")), "%" + lowerCaseFilter + "%")
+                );
+                predicates.add(contractNumberMatch);
             }
             if (!contractorNIP.isEmpty()) {
                 String lowerCaseFilter = contractorNIP.getValue().toLowerCase();
-                Predicate contractorNIPMatch = criteriaBuilder.like(criteriaBuilder.lower(root.get("contractorNIP")),
-                        lowerCaseFilter + "%");
-                predicates.add(criteriaBuilder.or(contractorNIPMatch));
+                Predicate contractorNIPMatch = criteriaBuilder.or(
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("contractorNIP")), lowerCaseFilter + "%"),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("contractorNIP")), "%" + lowerCaseFilter + "%")
+                );
+                predicates.add(contractorNIPMatch);
             }
             return criteriaBuilder.and(predicates.toArray(Predicate[]::new));
         }
