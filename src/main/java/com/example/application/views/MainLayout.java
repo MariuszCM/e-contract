@@ -160,7 +160,7 @@ public class MainLayout extends AppLayout {
 
 //                new MenuItemInfo("Hello World", LineAwesomeIcon.COLUMNS_SOLID.create(), HelloWorldView.class), //
 
-//                new MenuItemInfo("Znajdź", LineAwesomeIcon.FILTER_SOLID.create(), FindView.class), //
+                new MenuItemInfo("Znajdź", LineAwesomeIcon.FILTER_SOLID.create(), FindView.class), //
 
         };
     }
