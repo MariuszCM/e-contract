@@ -5,7 +5,6 @@ import com.example.application.security.AuthenticatedUser;
 import com.example.application.views.about.AboutView;
 import com.example.application.views.create.CreateView;
 import com.example.application.views.find.FindView;
-import com.example.application.views.helloworld.HelloWorldView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.avatar.Avatar;
@@ -157,8 +156,6 @@ public class MainLayout extends AppLayout {
                 new MenuItemInfo("Main", LineAwesomeIcon.GLOBE_SOLID.create(), AboutView.class), //
 
                 new MenuItemInfo("Utwórz", LineAwesomeIcon.USER.create(), CreateView.class), //
-
-//                new MenuItemInfo("Hello World", LineAwesomeIcon.COLUMNS_SOLID.create(), HelloWorldView.class), //
 
                 new MenuItemInfo("Znajdź", LineAwesomeIcon.FILTER_SOLID.create(), FindView.class), //
 
