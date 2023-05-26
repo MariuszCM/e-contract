@@ -55,8 +55,11 @@ public class FindView extends Div implements BeforeEnterObserver {
     private final String SAMPLEPERSON_EDIT_ROUTE_TEMPLATE = "find/%s/edit";
     private final Button cancel = new Button("Anuluj");
     private final Button save = new Button("Zapisz");
+    private final Button edit = new Button("Edytuj");
     private final ContractService contractService;
     private TextField contractNumber = new TextField("Number umowy");
+    private TextField connectedAgreement = new TextField("Numer powiązanej umowy");
+    private ComboBox<String> status = new ComboBox<>("Status");
     private TextField contractType = new TextField("Rodzaj umowy");
     private DatePicker signingDate = new DatePicker("Data podpisania");
     private TextField contractSigningPlace = new TextField("Miejsce zawarcia umowy");
@@ -83,6 +86,7 @@ public class FindView extends Div implements BeforeEnterObserver {
 
         createEditorLayout(splitLayout);
         sendToMF.setItems("Tak", "Nie");
+        status.setItems("Podpisane", "Odstąpione", "Wypowiedzone", "Rozwiązane za zgodą stron", "Zapłacone", "Wykonane");
         binder = new BeanValidationBinder<>(Contract.class);
         binder.bindInstanceFields(this);
 
@@ -140,6 +144,7 @@ public class FindView extends Div implements BeforeEnterObserver {
     private Component createGrid() {
 //        grid = new Grid<>(Contract.class, false);
         grid.addColumn("contractNumber").setAutoWidth(true);
+        grid.addColumn("connectedAgreement").setAutoWidth(true);
         grid.addColumn("contractorNIP").setAutoWidth(true);
         grid.addColumn("contractorName").setAutoWidth(true);
         grid.addColumn("contractSubject").setAutoWidth(true);
@@ -176,10 +181,22 @@ public class FindView extends Div implements BeforeEnterObserver {
         editorLayoutDiv.add(editorDiv);
 
         FormLayout formLayout = new FormLayout();
-        formLayout.add(contractNumber, contractType, signingDate, contractSigningPlace, contractStartDate, contractEndDate, contractSubject, totalValue, contractorNIP, contractorName, contractorAddress, sendToMF);
+        formLayout.add(contractNumber, connectedAgreement, status, contractType, signingDate, contractSigningPlace, contractStartDate, contractEndDate, contractSubject, totalValue, contractorNIP, contractorName, contractorAddress, sendToMF);
+        formLayout.setVisible(false);
 
         cancel.addClickListener(e -> {
+            cancel.setVisible(false);
+            save.setVisible(false);
+            formLayout.setVisible(false);
+            edit.setVisible(true);
             clearForm();
+            refreshGrid();
+        });
+        edit.addClickListener(e -> {
+            formLayout.setVisible(true);
+            cancel.setVisible(true);
+            edit.setVisible(false);
+            save.setVisible(true);
             refreshGrid();
         });
 
@@ -202,6 +219,10 @@ public class FindView extends Div implements BeforeEnterObserver {
             } catch (ValidationException validationException) {
                 Notification.show("Failed to update the data. Check again that all values are valid");
             }
+            cancel.setVisible(false);
+            save.setVisible(false);
+            formLayout.setVisible(false);
+            edit.setVisible(true);
         });
         editorDiv.add(formLayout);
         createButtonLayout(editorLayoutDiv);
@@ -214,7 +235,10 @@ public class FindView extends Div implements BeforeEnterObserver {
         buttonLayout.setClassName("button-layout");
         cancel.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        buttonLayout.add(save, cancel);
+        edit.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        buttonLayout.add(edit, save, cancel);
+        save.setVisible(false);
+        cancel.setVisible(false);
         editorLayoutDiv.add(buttonLayout);
     }
 
@@ -237,6 +261,7 @@ public class FindView extends Div implements BeforeEnterObserver {
     public static class Filters extends Div implements Specification<Contract> {
 
         private final TextField contractNumber = new TextField("Numer umowy");
+        private final TextField connectedAgreement = new TextField("Numer powiązanej umowy");
         private final TextField contractorNIP = new TextField("NIP Kontrahenta");
 
         public Filters(Runnable onSearch) {
@@ -252,6 +277,7 @@ public class FindView extends Div implements BeforeEnterObserver {
             resetBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
             resetBtn.addClickListener(e -> {
                 contractNumber.clear();
+                connectedAgreement.clear();
                 contractorNIP.clear();
                 onSearch.run();
             });
@@ -263,7 +289,7 @@ public class FindView extends Div implements BeforeEnterObserver {
             actions.addClassName(LumoUtility.Gap.SMALL);
             actions.addClassName("actions");
 
-            add(contractNumber, contractorNIP, actions);
+            add(contractNumber, connectedAgreement, contractorNIP, actions);
         }
 
         @Override
@@ -277,6 +303,14 @@ public class FindView extends Div implements BeforeEnterObserver {
                         criteriaBuilder.like(criteriaBuilder.lower(root.get("contractNumber")), "%" + lowerCaseFilter + "%")
                 );
                 predicates.add(contractNumberMatch);
+            }
+            if (!connectedAgreement.isEmpty()) {
+                String lowerCaseFilter = connectedAgreement.getValue().toLowerCase();
+                Predicate connectedContractNumberMatch = criteriaBuilder.or(
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("connectedAgreement")), lowerCaseFilter + "%"),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("connectedAgreement")), "%" + lowerCaseFilter + "%")
+                );
+                predicates.add(connectedContractNumberMatch);
             }
             if (!contractorNIP.isEmpty()) {
                 String lowerCaseFilter = contractorNIP.getValue().toLowerCase();

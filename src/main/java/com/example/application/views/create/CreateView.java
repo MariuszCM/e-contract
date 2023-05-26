@@ -9,6 +9,7 @@ import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.Uses;
@@ -30,7 +31,9 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 @AnonymousAllowed
 @Uses(Icon.class)
 public class CreateView extends Div {
-    private TextField contractNumber = new TextField("Number umowy");
+    private TextField contractNumber = new TextField("Number umowy/aneksu");
+    private TextField connectedAgreement = new TextField("Numer powiązanej umowy");
+    private Checkbox annex = new Checkbox("Aneks");
     private TextField contractType = new TextField("Rodzaj umowy");
     private DatePicker signingDate = new DatePicker("Data podpisania");
     private TextField contractSigningPlace = new TextField("Miejsce zawarcia umowy");
@@ -42,6 +45,7 @@ public class CreateView extends Div {
     private TextField contractorName = new TextField("Kontrahent");
     private TextField contractorAddress = new TextField("Siedziba/adres kontrahenta");
     private ComboBox<String> sendToMF = new ComboBox<>("Czy umowa/aneks przesyłana do rejestru MF");
+    private ComboBox<String> status = new ComboBox<>("Status");
     private HorizontalLayout horizontalLayoutNip = new HorizontalLayout();
     private final NipApiService regonApiPromptService;
     private Contract contract;
@@ -69,6 +73,8 @@ public class CreateView extends Div {
         contractorNIP.setMaxLength(10);
         contractorNIP.setMinLength(10);
         sendToMF.setItems("Tak", "Nie");
+        status.setItems("Podpisane");
+        connectedAgreement.setVisible(false);
 
         binder.bindInstanceFields(this);
         clearForm();
@@ -81,12 +87,12 @@ public class CreateView extends Div {
     }
 
     private Component createTitle() {
-        return new H3("Wprowadzanie nowej umowy");
+        return new H3("Wprowadzanie nowej umowy/aneksu");
     }
 
     private Component createFormLayout() {
         FormLayout formLayout = new FormLayout();
-        formLayout.add(contractNumber, contractType, signingDate, contractSigningPlace, contractStartDate,
+        formLayout.add(contractNumber, annex, connectedAgreement, status, contractType, signingDate, contractSigningPlace, contractStartDate,
                 contractEndDate, contractSubject, totalValue, horizontalLayoutNip, contractorName, contractorAddress, sendToMF);
         return formLayout;
     }
@@ -102,6 +108,7 @@ public class CreateView extends Div {
 
     private void addListener() {
         cancel.addClickListener(e -> clearForm());
+        annex.addClickListener(e -> connectedAgreement.setVisible(annex.getValue()));
         save.addClickListener(e -> {
             boolean result = binder.writeBeanIfValid(contract);
             if (result) {

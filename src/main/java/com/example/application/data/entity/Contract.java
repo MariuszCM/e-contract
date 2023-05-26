@@ -21,6 +21,8 @@ public class Contract extends AbstractEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String contractNumber;
+    private String connectedAgreement;
+    private String status;
     private String contractType;
     private LocalDate signingDate;
     private String contractSigningPlace;
