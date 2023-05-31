@@ -1,14 +1,15 @@
 package com.example.application.views.about;
 
 import com.example.application.views.MainLayout;
-import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.html.IFrame;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
+import com.vaadin.server.ExternalResource;
+import com.vaadin.ui.BrowserFrame;
 import jakarta.annotation.security.PermitAll;
 
 @PageTitle("About")
@@ -17,21 +18,20 @@ import jakarta.annotation.security.PermitAll;
 @PermitAll
 public class AboutView extends HorizontalLayout {
 
-    private TextField name;
-    private Button sayHello;
+    private BrowserFrame sample;
 
     public AboutView() {
-        name = new TextField("Your name");
-        sayHello = new Button("Say hello");
-        sayHello.addClickListener(e -> {
-            Notification.show("Hello " + name.getValue());
-        });
-        sayHello.addClickShortcut(Key.ENTER);
+        IFrame iframe = new IFrame("https://www.gov.pl/web/finanse/wiadomosci");
+        iframe.setWidth("100%");
+        iframe.setHeight("100%");
 
-        setMargin(true);
-        setVerticalComponentAlignment(Alignment.END, name, sayHello);
-
-//        add(name, sayHello);
+        setSizeFull();
+        add(iframe);
+//        VerticalLayout layout = new VerticalLayout();
+//        sample = new BrowserFrame("vaadin.com", new ExternalResource("https://vaadin.com/home"));
+//        sample.setSizeFull();
+//
+//        UI.getCurrent().add(window);
     }
 
 }
