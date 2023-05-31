@@ -27,11 +27,6 @@ public class AboutView extends HorizontalLayout {
 
         setSizeFull();
         add(iframe);
-//        VerticalLayout layout = new VerticalLayout();
-//        sample = new BrowserFrame("vaadin.com", new ExternalResource("https://vaadin.com/home"));
-//        sample.setSizeFull();
-//
-//        UI.getCurrent().add(window);
     }
 
 }
